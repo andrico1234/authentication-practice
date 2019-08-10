@@ -1,13 +1,13 @@
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 
-function ProtectedRoute({ render, auth }) {
+function ProtectedRoute({ render, auth, path }) {
   return (
     <Route
-      path="/profile"
+      path={path}
       render={props => {
         if (!auth.isAuthenticated()) {
-          return <Redirect to="/" />;
+          return auth.login();
         }
 
         return render(props);
