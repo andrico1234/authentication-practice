@@ -44,21 +44,20 @@ class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        const existingRedirectLocation =
-          localStorage.getItem(REDIRECT_ON_LOGIN) !== "undefined";
+        debugger;
+        const redirectLocation =
+          localStorage.getItem(REDIRECT_ON_LOGIN) === "undefined"
+            ? "/"
+            : JSON.parse(localStorage.getItem(REDIRECT_ON_LOGIN)).pathname;
 
-        if (existingRedirectLocation) {
-          this.history.push(
-            JSON.parse(localStorage.getItem(REDIRECT_ON_LOGIN))
-          );
-        } else {
-          this.history.push("/");
-        }
+        this.history.push(redirectLocation);
       } else if (err) {
         this.history.push("/");
         alert(`Error: ${err.error}`);
         console.log(err);
       }
+
+      localStorage.removeItem(REDIRECT_ON_LOGIN)
     });
   };
 
