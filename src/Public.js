@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function Public() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     async function getInitialData() {

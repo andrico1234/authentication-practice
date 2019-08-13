@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Home({ auth }) {
-  const result = auth.isAuthenticated();
+  const result = auth.isAuthenticated();  
 
   return (
     <div>

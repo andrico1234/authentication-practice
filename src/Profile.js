@@ -31,7 +31,7 @@ const Profile = ({ auth }) => {
         }
       });
     });
-  }, [auth]);
+  }, [auth]);  
 
   return (
     <div>
@@ -45,6 +45,7 @@ const Profile = ({ auth }) => {
           />
           <h2>{`${profile.given_name} ${profile.family_name}`}</h2>
           <h3>{profile.email}</h3>
+          <pre>{JSON.stringify(profile, null, 2)}</pre>
         </>
       )}
     </div>

@@ -8,6 +8,8 @@ import Auth from "./Auth/Auth";
 import Callback from "./Callback";
 import ProtectedRoute from "./ProtectedRoute";
 import Private from "./Private";
+import Courses from "./Courses";
+import ErrorPage from "./ErrorPage";
 
 class App extends React.Component {
   constructor(props) {
@@ -33,14 +35,23 @@ class App extends React.Component {
           <Route path="/public" component={Public} />
           <ProtectedRoute
             path="/private"
+            scopes={[]}
             auth={this.auth}
             render={props => <Private auth={this.auth} {...props} />}
           />
           <ProtectedRoute
+            path="/courses"
+            scopes={["read:courses"]}
+            auth={this.auth}
+            render={props => <Courses auth={this.auth} {...props} />}
+          />
+          <ProtectedRoute
+            scopes={[]}
             path="/profile"
             auth={this.auth}
             render={props => <Profile auth={this.auth} {...props} />}
           />
+          <Route path="/error" component={ErrorPage} />
         </div>
       </>
     );

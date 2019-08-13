@@ -21,6 +21,11 @@ const Nav = ({ auth }) => {
             <Link to="/private">Private</Link>
           </li>
         )}
+        {isAuthenticated() && (
+          <li>
+            <Link to="/courses">Courses</Link>
+          </li>
+        )}
         <li>
           <button onClick={isAuthenticated() ? logout : login}>
             {isAuthenticated() ? "Log out" : "login"}
