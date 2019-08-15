@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useContext} from "react";
 import { Route, Redirect } from "react-router-dom";
+import AuthContext from "./Auth/AuthContext";
 
-function ProtectedRoute({ render, auth, path, scopes }) {
+function ProtectedRoute({ render, path, scopes = [] }) {
+  const { login, isAuthenticated, userHasScopes } = useContext(AuthContext);
+
   return (
     <Route
       path={path}
       render={props => {
-        if (!auth.isAuthenticated()) {
-          return auth.login();
+        if (!isAuthenticated()) {
+          return login();
         }
 
-        if (!auth.userHasScopes(scopes)) {
-          return <Redirect to="error" />
+        if (!userHasScopes(scopes)) {
+          return <Redirect to="error" />;
         }
 
         return render(props);

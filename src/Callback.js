@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import AuthContext from "./Auth/AuthContext";
 
-function Callback({ location, auth }) {
+function Callback({ location }) {
   const [isMounted, setMounted] = useState(false);
+  const { handleAuthentication } = useContext(AuthContext);
+
 
   useEffect(() => {
     if (/access-token|id_token|error/.test(location.hash)) {
-      auth.handleAuthentication();
+      handleAuthentication();
       setMounted(true);
     } else {
       throw new Error("Invalid callback URL");

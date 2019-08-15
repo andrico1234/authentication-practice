@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import AuthContext from "./Auth/AuthContext";
 
-function Home({ auth }) {
-  const result = auth.isAuthenticated();  
+function Home() {
+  const { login, isAuthenticated } = useContext(AuthContext);
+  const result = isAuthenticated();  
 
   return (
     <div>
@@ -12,7 +14,7 @@ function Home({ auth }) {
           <Link to="/profile">View Profile </Link>
         </>
       ) : (
-        <button onClick={auth.login}>Log in</button>
+        <button onClick={login}>Log in</button>
       )}
     </div>
   );

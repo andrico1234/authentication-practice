@@ -1,10 +1,17 @@
+import React, { createContext } from "react";
 import auth0 from "auth0-js";
 
 const REDIRECT_ON_LOGIN = "redirect_on_login";
 
-class Auth {
-  constructor(history) {
-    this.history = history;
+const AuthContext = createContext({});
+
+export const AuthConsumer = AuthContext.Consumer;
+
+export class AuthProvider extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.history = props.history;
     this.userProfile = null;
     this.requestedScopes = "openid profile email read:courses";
     this.auth0 = new auth0.WebAuth({
@@ -57,7 +64,7 @@ class Auth {
         console.log(err);
       }
 
-      localStorage.removeItem(REDIRECT_ON_LOGIN)
+      localStorage.removeItem(REDIRECT_ON_LOGIN);
     });
   };
 
@@ -113,6 +120,25 @@ class Auth {
 
     return scopes.every(scope => grantedScopes.includes(scope));
   };
+
+  render() {
+    return (
+      <AuthContext.Provider
+        value={{
+          login: this.login,
+          logout: this.logout,
+          handleAuthentication: this.handleAuthentication,
+          setSession: this.setSession,
+          isAuthenticated: this.isAuthenticated,
+          getAccessToken: this.getAccessToken,
+          getProfile: this.getProfile,
+          userHasScopes: this.userHasScopes
+        }}
+      >
+        {this.props.children}
+      </AuthContext.Provider>
+    );
+  }
 }
 
-export default Auth;
+export default AuthContext;

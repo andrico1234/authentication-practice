@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import AuthContext from "./Auth/AuthContext";
 
-function Private({ auth }) {
+function Private() {
   const [message, setMessage] = useState("");
+  const { getAccessToken } = useContext(AuthContext);
+
 
   useEffect(() => {
     async function getInitialData() {
       try {
         const res = await fetch(`/private`, {
           headers: {
-            Authorization: `Bearer ${auth.getAccessToken()}`
+            Authorization: `Bearer ${getAccessToken()}`
           }
         });
         const parsedResponse = await res.json();

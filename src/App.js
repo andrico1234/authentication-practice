@@ -4,7 +4,7 @@ import Home from "./Home";
 import Profile from "./Profile";
 import Nav from "./Nav";
 import Public from "./Public";
-import Auth from "./Auth/Auth";
+import { AuthProvider } from "./Auth/AuthContext";
 import Callback from "./Callback";
 import ProtectedRoute from "./ProtectedRoute";
 import Private from "./Private";
@@ -12,48 +12,37 @@ import Courses from "./Courses";
 import ErrorPage from "./ErrorPage";
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.auth = new Auth(props.history);
-  }
-
   render() {
     return (
-      <>
-        <Nav auth={this.auth} />
+      <AuthProvider history={this.props.history}>
+        <Nav/>
         <div className="body">
           <Route
             path="/"
             exact
-            render={props => <Home auth={this.auth} {...props} />}
+            render={props => <Home {...props} />}
           />
           <Route
             path="/callback"
-            render={props => <Callback auth={this.auth} {...props} />}
+            render={props => <Callback {...props} />}
           />
           <Route path="/public" component={Public} />
           <ProtectedRoute
             path="/private"
-            scopes={[]}
-            auth={this.auth}
-            render={props => <Private auth={this.auth} {...props} />}
+            render={props => <Private {...props} />}
           />
           <ProtectedRoute
             path="/courses"
             scopes={["read:courses"]}
-            auth={this.auth}
-            render={props => <Courses auth={this.auth} {...props} />}
+            render={props => <Courses {...props} />}
           />
           <ProtectedRoute
-            scopes={[]}
             path="/profile"
-            auth={this.auth}
-            render={props => <Profile auth={this.auth} {...props} />}
+            render={props => <Profile {...props} />}
           />
           <Route path="/error" component={ErrorPage} />
         </div>
-      </>
+      </AuthProvider>
     );
   }
 }
