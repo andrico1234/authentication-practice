@@ -4,7 +4,7 @@ import AuthContext from "./Auth/AuthContext";
 
 function Home() {
   const { login, isAuthenticated } = useContext(AuthContext);
-  const result = isAuthenticated();  
+  const result = isAuthenticated();
 
   return (
     <div>

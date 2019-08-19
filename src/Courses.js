@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
-import AuthContext from "./Auth/AuthContext";
+import React, { useState, useEffect } from "react";
 
-function Courses() {
+function Courses({ auth }) {
   const [courses, setCourses] = useState([]);
   const [adminMessage, setAdminMessage] = useState('');
-  const { getAccessToken } = useContext(AuthContext)
 
   useEffect(() => {
     async function getInitialData() {
       try {
         const res = await fetch(`/courses`, {
           headers: {
-            Authorization: `Bearer ${getAccessToken()}`
+            Authorization: `Bearer ${auth.getAccessToken()}`
           }
         });
         const parsedResponse = await res.json();        
@@ -30,7 +28,7 @@ function Courses() {
       try {
         const res = await fetch(`/admin`, {
           headers: {
-            Authorization: `Bearer ${getAccessToken()}`
+            Authorization: `Bearer ${auth.getAccessToken()}`
           }
         });
         const parsedResponse = await res.json();        

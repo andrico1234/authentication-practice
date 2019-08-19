@@ -1,5 +1,4 @@
-import React, { useReducer, useEffect, useContext } from "react";
-import AuthContext from "./Auth/AuthContext";
+import React, { useReducer, useEffect } from "react";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -18,9 +17,8 @@ const initialState = {
   error: ""
 };
 
-const Profile = () => {
+const Profile = ({ auth }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const auth = useContext(AuthContext);
   const { profile, error } = state;
 
   useEffect(() => {

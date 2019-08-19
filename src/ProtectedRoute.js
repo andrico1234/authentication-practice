@@ -1,9 +1,10 @@
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import { Route, Redirect } from "react-router-dom";
 import AuthContext from "./Auth/AuthContext";
 
 function ProtectedRoute({ render, path, scopes = [] }) {
-  const { login, isAuthenticated, userHasScopes } = useContext(AuthContext);
+  const auth = useContext(AuthContext);
+  const { login, isAuthenticated, userHasScopes } = auth;
 
   return (
     <Route
@@ -17,7 +18,7 @@ function ProtectedRoute({ render, path, scopes = [] }) {
           return <Redirect to="error" />;
         }
 
-        return render(props);
+        return render({ ...props, auth });
       }}
     />
   );

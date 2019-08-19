@@ -7,6 +7,12 @@ const AuthContext = createContext({});
 
 export const AuthConsumer = AuthContext.Consumer;
 
+// eslint-disable-next-line
+let _idToken = null;
+let _accessToken = null;
+let _scopes = "";
+let _expiresAt = null;
+
 export class AuthProvider extends React.Component {
   constructor(props) {
     super(props);
@@ -22,6 +28,10 @@ export class AuthProvider extends React.Component {
       responseType: "token id_token",
       scope: this.requestedScopes
     });
+
+    this.state = {
+      tokenRenewalComplete: false
+    };
   }
 
   login = () => {
@@ -38,20 +48,13 @@ export class AuthProvider extends React.Component {
       clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
       returnTo: "http://localhost:3000"
     });
-
-    this.userProfile = null;
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("idToken");
-    localStorage.removeItem("expiresAt");
-    localStorage.removeItem("scopes");
   };
 
   handleAuthentication = () => {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        debugger;
+
         const redirectLocation =
           localStorage.getItem(REDIRECT_ON_LOGIN) === "undefined"
             ? "/"
@@ -69,32 +72,24 @@ export class AuthProvider extends React.Component {
   };
 
   setSession = authResult => {
-    const expiresAt = JSON.stringify(
-      authResult.expiresIn * 1000 + new Date().getTime()
-    );
+    _expiresAt = authResult.expiresIn * 1000 + new Date().getTime();
+    _scopes = authResult.scopes || this.requestedScopes || "";
+    _accessToken = authResult.accessToken;
+    _idToken = authResult.idToken;
 
-    const scopes = authResult.scopes || this.requestedScopes || "";
-
-    localStorage.setItem("accessToken", authResult.accessToken);
-    localStorage.setItem("idToken", authResult.idToken);
-    localStorage.setItem("expiresAt", expiresAt);
-    localStorage.setItem("scopes", JSON.stringify(scopes));
+    this.scheduleTokenRenewal();
   };
 
   isAuthenticated = () => {
-    const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
-
-    return expiresAt > new Date().getTime();
+    return _expiresAt > new Date().getTime();
   };
 
   getAccessToken = () => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
+    if (!_accessToken) {
       throw new Error("No access token found");
     }
 
-    return accessToken;
+    return _accessToken;
   };
 
   getProfile = cb => {
@@ -114,11 +109,33 @@ export class AuthProvider extends React.Component {
   };
 
   userHasScopes = scopes => {
-    const grantedScopes = JSON.parse(
-      localStorage.getItem("scopes") || ""
-    ).split(" ");
+    const grantedScopes = _scopes.split(" ");
 
     return scopes.every(scope => grantedScopes.includes(scope));
+  };
+
+  renewToken = () => {
+    this.auth0.checkSession({}, (err, authResult) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.setSession(authResult);
+      }
+
+      this.setState({
+        tokenRenewalComplete: true
+      });
+    });
+  };
+
+  scheduleTokenRenewal = () => {
+    const delay = _expiresAt - Date.now();
+
+    if (delay > 0) {
+      setTimeout(() => {
+        this.renewToken();
+      }, delay);
+    }
   };
 
   render() {
@@ -132,7 +149,9 @@ export class AuthProvider extends React.Component {
           isAuthenticated: this.isAuthenticated,
           getAccessToken: this.getAccessToken,
           getProfile: this.getProfile,
-          userHasScopes: this.userHasScopes
+          userHasScopes: this.userHasScopes,
+          renewToken: this.renewToken,
+          tokenRenewalComplete: this.state.tokenRenewalComplete
         }}
       >
         {this.props.children}
